@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-userSchema.methods.generateAuthtoken = async function () {
+userSchema.methods.generateAuthToken = async function () {
   try {
     const token = jwt.sign(
       {
