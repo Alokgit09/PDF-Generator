@@ -16,7 +16,7 @@ const LogIn = () => {
       let resultData = result.data;
       console.log("resultData>>", resultData);
       if (resultData) {
-        navigate("/report");
+        navigate("/report")
         localStorage.setItem("User", JSON.stringify(resultData));
         localStorage.setItem("Token", JSON.stringify(resultData.jwtToken));
       } else {

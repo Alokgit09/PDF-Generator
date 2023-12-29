@@ -14,6 +14,75 @@ const userSchema = new mongoose.Schema(
       type: String,
       require: true,
     },
+    email: {
+      type: String,
+      require: true,
+    },
+    status: {
+      type: String,
+      require: true,
+    },
+    ticket_name: {
+      type: String,
+      require: true,
+    },
+    order_Id: {
+      type: String,
+      require: true,
+    },
+    transaction_status: {
+      type: String,
+      require: true,
+    },
+    ticket_price: {
+      type: String,
+      require: true,
+    },
+    registration_time: {
+      type: String,
+      require: true,
+    },
+    contact_number: {
+      type: String,
+      require: true,
+    },
+    gender: {
+      type: String,
+      require: true,
+    },
+    blood_group: {
+      type: String,
+      require: true,
+    },
+    address: {
+      type: String,
+      require: true,
+    },
+    city: {
+      type: String,
+      require: true,
+    },
+    state: {
+      type: String,
+      require: true,
+    },
+    pincode: {
+      type: String,
+      require: true,
+    },
+    country: {
+      type: String,
+      require: true,
+    },
+    date_of_birth: {
+      type: String,
+      require: true,
+    },
+    attendee_check_in: {
+      type: String,
+      require: true,
+    },
+
     token: {
       type: String,
       require: true,
@@ -41,6 +110,7 @@ userSchema.methods.generateAuthToken = async function () {
   } catch (err) {
     console.log("Schema Token err>>", err);
     res.json({ message: "Schema Token err>>>>", err });
+    
   }
 };
 

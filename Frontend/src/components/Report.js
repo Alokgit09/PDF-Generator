@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import axios from "axios";
+import ReactDOMServer from 'react-dom/server';
+
+
 
 const Report = () => {
+
   const [user, setUser] = useState('');
 
   useEffect(() => {
@@ -20,8 +24,8 @@ const Report = () => {
 
 
 
-  const hendlePdfDownload = async () => {
-    
+  const hendlePdfDownload = async (ee) => {
+    ee.preventDefault();
     try{
       const result = await axios.get("http://localhost:9090/report");
       const Dataend =  result.data;
@@ -39,11 +43,14 @@ const Report = () => {
   <h3>ID: {user.register_id}</h3>
   <h3>Name: {user.name}</h3>
  </div>
-   <button onClick={ hendlePdfDownload} type="button" id='btnPDFgenerator'>
+   <button onClick= {hendlePdfDownload} type="button" id='btnPDFgenerator'>
                 Download PDF
               </button>
     </div>
+
   )
 }
 
-export default Report
+
+
+export default Report;
