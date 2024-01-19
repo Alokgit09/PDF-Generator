@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Nav from '../components/Nav';
 
 const LogIn = () => {
   const [registerId, setRegisterId] = useState("");
@@ -29,6 +30,7 @@ const LogIn = () => {
 
   return (
     <div>
+      <Nav />
       <div className="login-sec2">
         <center>
           <div className="page_content1">

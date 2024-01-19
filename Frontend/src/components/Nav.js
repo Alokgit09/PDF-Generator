@@ -6,15 +6,15 @@ const Nav = () => {
     <>
       <div className='navbar-sec1'>
         <ul>
-            <li>
+          <li>
             <Link to="/">Home</Link>
-            </li>
-            <li>
+          </li>
+          <li>
             <Link to="/report">Report</Link>
-            </li>
-            <li>
+          </li>
+          <li>
             <Link to="/login">LogIn</Link>
-            </li>
+          </li>
         </ul>
       </div>
     </>

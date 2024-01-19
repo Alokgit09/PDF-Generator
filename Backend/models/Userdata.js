@@ -110,7 +110,7 @@ userSchema.methods.generateAuthToken = async function () {
   } catch (err) {
     console.log("Schema Token err>>", err);
     res.json({ message: "Schema Token err>>>>", err });
-    
+
   }
 };
 

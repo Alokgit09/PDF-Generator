@@ -8,16 +8,16 @@ import Login from './components/LogIn';
 function App() {
   return (
     <>
-    <div className="App">
-      <BrowserRouter>
-      <Nav />
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/report' element={<Report />} />
-        <Route path='/login' element={<Login />} />
-      </Routes>
-      </BrowserRouter>
-    </div>
+      <div className="App">
+        <BrowserRouter>
+          {/* <Nav /> */}
+          <Routes>
+            <Route path='/' element={<Home />} />
+            <Route path='/report' element={<Report />} />
+            <Route path='/login' element={<Login />} />
+          </Routes>
+        </BrowserRouter>
+      </div>
     </>
   );
 }

@@ -1,56 +1,61 @@
-import React, { useEffect, useState } from 'react'
-import axios from "axios";
-import ReactDOMServer from 'react-dom/server';
-
-
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Document, Page } from 'react-pdf';
 
 const Report = () => {
+    const [pdfData, setPdfData] = useState('');
+    const [error, setError] = useState(null);
 
-  const [user, setUser] = useState('');
+    useEffect(() => {
+        const getUserData = async () => {
+            // let id = JSON.parse(localStorage.getItem('User')).registerID;
+            let id = JSON.parse(localStorage.getItem('UserBtn')).registerID;
+            let userName = JSON.parse(localStorage.getItem('User')).name;
+            try {
+                const response = await axios.get(`http://localhost:9090/getuserdata/${id}`);
+                let data = response.data;
+                let pdfPathurl = 'http://localhost:9090' + data;
+                setPdfData(pdfPathurl);
+            } catch (error) {
+                console.error('Error fetching PDF data:', error);
+                setError(`${userName} Please Generate PDF File`);
+            }
+        };
 
-  useEffect(() => {
-   getUserData();
-  }, []);
-
-  const getUserData = async () => {
-  let id = JSON.parse(localStorage.getItem("User")).registerID;
-  // let result = await fetch(`http://localhost:9090/getuserdata/${id}`);
-  // let res = await result.json()
-
-  let result = await axios.get(`http://localhost:9090/getuserdata/${id}`);
-  let res = result.data;
-  setUser(res); 
-}
-
-
-
-  const hendlePdfDownload = async (ee) => {
-    ee.preventDefault();
-    try{
-      const result = await axios.get("http://localhost:9090/report");
-      const Dataend =  result.data;
-      console.log("Dataend>>", Dataend);
-    }catch(err){
-       console.log("Error.. PDF>>>", err)
-    }
-
-  }
-
-  return (
-    <div>
-      <h2>Report Page</h2>
-   <div className='userData'>
-  <h3>ID: {user.register_id}</h3>
-  <h3>Name: {user.name}</h3>
- </div>
-   <button onClick= {hendlePdfDownload} type="button" id='btnPDFgenerator'>
-                Download PDF
-              </button>
-    </div>
-
-  )
-}
+        getUserData();
+    }, []);
 
 
+
+    const generateDocPdf = async () => {
+        let id = JSON.parse(localStorage.getItem('User')).registerID;
+
+        try {
+            const response = await axios.post(`http://localhost:9090/generatpdf/${id}`);
+            let data = response.data;
+            let pdfPathurl = 'http://localhost:9090' + data;
+            setTimeout(() => {
+                setPdfData(pdfPathurl);
+            }, 1000);
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            setError('Failed to generate PDF.');
+        }
+
+
+    };
+
+    return (
+        <div>
+            {error && <h3 className='erro_msg'> {error}</h3>}
+            {/* <iframe src={pdfData} /> */}
+            {
+                pdfData ? <object width="100%" height="600" data={pdfData} type="application/pdf"></object>
+                    : <button className='pdfgenerat_btn' onClick={generateDocPdf} >Generate PDF</button>
+            }
+        </div>
+    );
+};
 
 export default Report;
+

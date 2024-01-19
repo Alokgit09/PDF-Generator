@@ -1,6 +1,10 @@
 const express = require("express");
 const UserData = require("./models/Userdata");
+const PdfData = require("./models/Pdfpathdata");
 require("./db/connect");
+const CandinetList = require("./controllers/Candinetlist");
+const GeneratepdfClick = require("./controllers/Candinetlist");
+
 const Puppeteer = require("puppeteer");
 const path = require("path");
 const cors = require("cors");
@@ -10,6 +14,7 @@ const PDFGenerator = require("pdfkit");
 const multer = require("multer");
 const csv = require("csvtojson");
 const bodyParser = require("body-parser");
+const generatePdfonClick = require("./controllers/Generatepdfclick");
 //  require('');
 
 const port = 9090;
@@ -18,6 +23,8 @@ app.use(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.resolve(__dirname, "./public")));
+
+console.log(path.resolve(__dirname, "./invoices_pdf"));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -117,24 +124,35 @@ app.post("/login", async (req, res) => {
 ////////// Get User Data PDF //////////////
 
 app.get("/getuserdata/:id", async (req, res) => {
+  // require('./public/invoices_pdf/');
   try {
     const { id } = req.params;
-    const trackId = await UserData.findOne({ register_id: id });
-    res.status(201).json(trackId);
-    console.log("userinfo>>>", trackId);
+    const trackId = await PdfData.findOne({ register_id: id });
+    const pdfPathuser = path.join(__dirname, `./public/${trackId.pdfPath}`);
+    if (fs.existsSync(pdfPathuser)) {
+      res.setHeader('Content-Type', 'application/pdf');
+      console.log("pdfPathuser>>", pdfPathuser);
+      res.send(
+        `/${trackId.pdfPath}`
+      )
+    } else {
+      res.status(404).send('PDF File Not Found');
+    }
+
   } catch (err) {
     console.log("getuserdata Data err>>", err);
     res.status(401).json({ message: "getuserdata Data err>>", err });
   }
 });
 
+
 ////////// Generate PDF //////////////
+
 
 app.post("/generatpdf/:id", async (req, res) => {
   try {
     const task_id = req.params.id;
     const distanceMargin = 18;
-
     function jumpLine(theOutput, lines) {
       for (let index = 0; index < lines; index++) {
         theOutput.moveDown();
@@ -150,9 +168,20 @@ app.post("/generatpdf/:id", async (req, res) => {
       });
       const todayDate = new Date();
       // pipe to a writable stream which would save the result into the same directory
+      const pdfPath = `/invoices_pdf/${todayDate.getTime()}.pdf`;
+      console.log("Writing>>", pdfPath)
       const PDFurl = theOutput.pipe(
-        fs.createWriteStream(`./invoices_pdf/${todayDate.getTime()}.pdf`)
+        fs.createWriteStream(path.resolve(__dirname, `./public/${pdfPath}`))
       );
+
+
+      let userPdf = await PdfData.create({
+        register_id: matchData.register_id,
+        pdfPath: pdfPath,
+      });
+
+      console.log('check>>>', userPdf);
+
       theOutput
         .rect(0, 0, theOutput.page.width, theOutput.page.height)
         .fill("#fff");
@@ -168,60 +197,101 @@ app.post("/generatpdf/:id", async (req, res) => {
         )
         .stroke();
 
+      ////////  Top Section ////////
 
       theOutput
         // .image("logo.png", 50, 45, { width: 50 })
-        .fillColor("#444444")
-        .fontSize(20)
-        .text("ACME Inc.", 110, 57)
-        .fontSize(10)
-        .text("ACME Inc.", 200, 50, { align: "right" })
-        .text("123 Main Street", 200, 65, { align: "right" })
-        .text("New York, NY, 10025", 200, 80, { align: "right" })
+        .fillColor("#000000")
+        .fontSize(14)
+        .text(`Register-Id:- ${matchData.register_id}`, 65, 70, { align: "left" })
+        .text(`E-Mail: ${matchData.email}`, 65, 90, { align: "left" })
+        .text(`Phone No.: ${matchData.contact_number}`, 65, 110, { align: "left" })
+        .image('./photos/download.png', 370, 35, { width: 100 })
+        .fontSize(14)
+        .text(`${matchData.address}`, 200, 70, { align: "right" })
+        .text(`${matchData.city} (${matchData.pincode})`, 200, 90, { align: "right" })
+        .text(`(${matchData.state}) ${matchData.country}`, 200, 110, { align: "right" })
+
+        .moveDown();
+
+      ////////  Middle Section ////////
+
+      jumpLine(theOutput, 1);
+
+      theOutput
+        .fillColor("#0e8cc3")
+        .fontSize(37)
+        .font('./font/Fondamento/Fondregular.ttf')
+        .text("Certificate of Half Marathon", { align: "center", width: '460', bold: "true" })
+        .fillColor("#000000")
+        .fontSize(18)
+        .text("This Certificate Presented to", { align: "center", width: '443' }, jumpLine(theOutput, 1))
+        .fillColor("#946F3C")
+        .fontSize(25)
+        .font('Times-Roman')
+        .text(`${matchData.name}`, { align: "center", width: '443' })
+        .fillColor("#000000")
+        .fontSize(14)
+        .text("The certificate of achievement is awarded to individuals who have demonstrated outstanding performance in their field. Here’s an example text for a certificate.",
+          { align: "center", width: '443', }, jumpLine(theOutput, 1));
+
+
+
+      ////////  Bottom Section //////// 
+      theOutput
+        .fillColor("#000000")
+        .fontSize(15)
+        .text(`Date of Birth: ${matchData.date_of_birth}`, 65, 380, { align: "left" })
+        .text(`Gender: ${matchData.gender}`, 65, 380, { align: "center" })
+        .text(`Blood Group: ${matchData.blood_group}`, 200, 380, { align: "right" })
         .moveDown();
 
 
-      jumpLine(theOutput, 4);
-      theOutput.fontSize(13).fill("#021c27").text("CERTIFICATE OF COMPLETION", {
-        align: "center",
-      });
-      jumpLine(theOutput, 1);
-      theOutput.fontSize(11).fill("#021c27").text("Present to", {
-        align: "center",
-      });
-      jumpLine(theOutput, 1);
-      theOutput.fontSize(20).fill("#000000").text(`${matchData.name}`, {
-        align: "center",
-      });
-
-      /////Address Info////
 
       theOutput
+        // .image("logo.png", 50, 45, { width: 50 })
+        .fillColor("#000000")
         .fontSize(14)
-        .fill("#000000")
-        .text(`Address: ${matchData.address}`, 50, 400, {
-          align: "right",
-        });
+        .text(`${matchData.registration_time}`, 55, 460, { align: "center", width: 200 })
+        .text("_______________________", 65, 470, { align: "left", width: 210 })
+        .text("DATE-TIME", 55, 490, { align: "center", width: 200, bold: "true" })
+        .image('./photos/botlogo.png', 360, 430, { width: 120 })
+        .fontSize(14)
+        .text("_______________________", 200, 470, { align: "right" })
+        .text("SIGNATURE", 640, 490, { bold: "true" })
+
+        .moveDown();
 
       const filePath = path.join(
         __dirname,
         `./invoices_pdf/${todayDate.getTime()}.pdf`
       );
-      if (fs.existsSync(filePath)) {
-        res.sendFile(filePath);
+      const absolutePath = path.resolve(filePath);
+      console.log("filePath>>>", absolutePath);
+      if (fs.existsSync(absolutePath)) {
+        res.status(201).sendFile(absolutePath);
       } else {
-        res.status(404).send("File not found");
+        console.log("File not found");
+        res.status(201).send(pdfPath);
       }
+
       theOutput.end();
     } else {
       console.log("Ragister ID is not Matched");
-      res.status(404).send("Ragister ID is not Matched");
     }
   } catch (err) {
     console.log("get-Err>>", err);
   }
 });
 
+
+app.get('/allcandidates', CandinetList);
+
+app.post('/clickgetpdf/:id', generatePdfonClick);
+
+
 app.listen(port, () => {
   console.log(`connetion is setup at ${port}`);
 });
+
+
