@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-// const navigate = useNavigate();
-
 
 const Home = () => {
-
+  const navigate = useNavigate();
   const [candinetList, setCandinetList] = useState([]);
-
-
+  const [inicial, setinicial] = useState([]);
 
   const itemsPerPage = 20;
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -35,6 +33,7 @@ const Home = () => {
       // const CandinetData = JSON.stringify(response.data);
       const CandinetData = response.data;
       setCandinetList(CandinetData);
+      setinicial(CandinetData);
       console.log("CandinetData>>", CandinetData);
     } catch (err) {
       console.log("handleCandinetList Error>>", err);
@@ -49,15 +48,32 @@ const Home = () => {
       console.log("resultData>>", resultData);
       if (resultData) {
         localStorage.setItem("UserBtn", JSON.stringify(resultData));
-        // navigate("../components/Report");
+        navigate("report");
+
       } else {
         alert("Invalid Registered Id and Name");
       }
     } catch (err) {
       console.log("login Page Err >>", err);
+
     }
   }
 
+  const handleChange = (e) => {
+    const query = e.target.value;
+    console.log('Query:', query);
+
+    setSearchQuery(query);
+
+    if (!query) {
+      console.log('Setting candinetList to currentItems');
+      setCandinetList(inicial);
+    } else {
+      const searchedData = inicial.filter(item => item.name.toLowerCase().match(query.toLowerCase()));
+      console.log('Filtered Data:', searchedData);
+      setCandinetList(searchedData);
+    }
+  };
 
   return (
     <>
@@ -66,28 +82,32 @@ const Home = () => {
           <h3>Dashboard</h3>
           <div className='sidesec-sec1'>
             <div className='side_link'><Link to="/">Home</Link></div>
-            <div className='side_link'><Link to="/report">Report</Link></div>
-            <div className='side_link'> <Link to="/login">LogIn</Link></div>
+            {/* <div className='side_link'><Link to="/report">Report</Link></div>
+            <div className='side_link'> <Link to="/login">LogIn</Link></div> */}
           </div>
         </div>
         <div className='top_bar'>
           <div className='banner_top'>INDIAN_ARMY_VETERANS_HALF_MARATHON__REGISTRATION_DATA</div>
           <div className='heading_runer'>
             <p className='list_name'>CANDINETS LIST</p>
+            <p className='search_input' ><span>Search Name</span>
+              <input type="search" className='search_bar' placeholder='Name' value={searchQuery} onChange={handleChange} /></p>
           </div>
           <div className='list_content'>
             <table className='table_list'>
               <thead>
                 <tr>
+                  <th>Generate PDF</th>
                   <th>Registration Id</th>
                   <th>Name</th>
                   <th>Email</th>
                   <th>Gender</th>
                   <th>City</th>
+                  <th>State</th>
                   <th>Contact Number</th>
+                  <th>Blood Group</th>
                   <th>Date of Birth</th>
                   <th>Status</th>
-                  <th>Generate PDF</th>
                 </tr>
               </thead>
               <tbody>
@@ -98,15 +118,17 @@ const Home = () => {
                     // const numbers = ;
                     return (
                       <tr key={index}>
+                        <td><button className='generat_pdfbtn' onClick={() => handleGetId(listitem.register_id)}>Generate PDF</button></td>
                         <td>{listitem.register_id}</td>
                         <td>{listitem.name}</td>
                         <td>{listitem.email}</td>
                         <td>{listitem.gender}</td>
                         <td>{listitem.city}</td>
+                        <td>{listitem.state}</td>
                         <td>{listitem.contact_number}</td>
+                        <td>{listitem.blood_group}</td>
                         <td>{listitem.date_of_birth}</td>
                         <td>{listitem.status}</td>
-                        <td><button onClick={() => handleGetId(listitem.register_id)}>btn</button></td>
                       </tr>
                     )
                   })

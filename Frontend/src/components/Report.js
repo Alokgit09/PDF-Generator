@@ -10,7 +10,7 @@ const Report = () => {
         const getUserData = async () => {
             // let id = JSON.parse(localStorage.getItem('User')).registerID;
             let id = JSON.parse(localStorage.getItem('UserBtn')).registerID;
-            let userName = JSON.parse(localStorage.getItem('User')).name;
+            // let userName = JSON.parse(localStorage.getItem('User')).name;
             try {
                 const response = await axios.get(`http://localhost:9090/getuserdata/${id}`);
                 let data = response.data;
@@ -18,7 +18,7 @@ const Report = () => {
                 setPdfData(pdfPathurl);
             } catch (error) {
                 console.error('Error fetching PDF data:', error);
-                setError(`${userName} Please Generate PDF File`);
+                setError("Please Generate PDF File");
             }
         };
 
@@ -28,7 +28,7 @@ const Report = () => {
 
 
     const generateDocPdf = async () => {
-        let id = JSON.parse(localStorage.getItem('User')).registerID;
+        let id = JSON.parse(localStorage.getItem('UserBtn')).registerID;
 
         try {
             const response = await axios.post(`http://localhost:9090/generatpdf/${id}`);
@@ -47,7 +47,8 @@ const Report = () => {
 
     return (
         <div>
-            {error && <h3 className='erro_msg'> {error}</h3>}
+            {
+                pdfData ? null : error && <h3 className='erro_msg'> {error}</h3>}
             {/* <iframe src={pdfData} /> */}
             {
                 pdfData ? <object width="100%" height="600" data={pdfData} type="application/pdf"></object>

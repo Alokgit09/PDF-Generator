@@ -3,7 +3,9 @@ const UserData = require("./models/Userdata");
 const PdfData = require("./models/Pdfpathdata");
 require("./db/connect");
 const CandinetList = require("./controllers/Candinetlist");
-const GeneratepdfClick = require("./controllers/Candinetlist");
+const generatePdfonClick = require("./controllers/Generatepdfclick");
+const GetfilteridName = require("./controllers/Fillter");
+
 
 const Puppeteer = require("puppeteer");
 const path = require("path");
@@ -14,7 +16,7 @@ const PDFGenerator = require("pdfkit");
 const multer = require("multer");
 const csv = require("csvtojson");
 const bodyParser = require("body-parser");
-const generatePdfonClick = require("./controllers/Generatepdfclick");
+
 //  require('');
 
 const port = 9090;
@@ -289,6 +291,7 @@ app.get('/allcandidates', CandinetList);
 
 app.post('/clickgetpdf/:id', generatePdfonClick);
 
+app.get('/getidname/?', GetfilteridName);
 
 app.listen(port, () => {
   console.log(`connetion is setup at ${port}`);
