@@ -5,6 +5,8 @@ require("./db/connect");
 const CandinetList = require("./controllers/Candinetlist");
 const generatePdfonClick = require("./controllers/Generatepdfclick");
 const GetfilteridName = require("./controllers/Fillter");
+const { adminRegistration, adminLogininfo } = require("./controllers/LoginSignUp");
+const Auth = require('./Middelware/Auth');
 
 
 const Puppeteer = require("puppeteer");
@@ -94,34 +96,6 @@ app.post("/createdata", async (req, res) => {
   }
 });
 
-////////// Login Data  //////////////
-
-app.post("/login", async (req, res) => {
-  try {
-    const registerid = req.body.register_id;
-    if (registerid) {
-      const matchData = await UserData.findOne({ register_id: registerid });
-      console.log("registerid>>", matchData);
-      if (matchData) {
-        const Token = await matchData.generateAuthToken();
-        let tokenMail = {
-          name: matchData.name,
-          registerID: matchData.register_id,
-          jwtToken: Token,
-        };
-        console.log("matchData", tokenMail);
-        res.status(201).json(tokenMail);
-      } else {
-        res.status(401).send({ message: "Invalid Registered Id and Name" });
-      }
-    } else {
-      console.log("Please Fill All Fields");
-      res.status(401).send({ message: "Please Fill All Fields" });
-    }
-  } catch (err) {
-    console.log("loginuser Data err>>", err);
-  }
-});
 
 ////////// Get User Data PDF //////////////
 
@@ -287,14 +261,27 @@ app.post("/generatpdf/:id", async (req, res) => {
 });
 
 
-app.get('/allcandidates', CandinetList);
+app.get('/allcandidates', Auth, CandinetList);
 
 app.post('/clickgetpdf/:id', generatePdfonClick);
 
 app.get('/getidname/?', GetfilteridName);
 
+app.post('/signup', adminRegistration);
+
+app.post('/login', adminLogininfo);
+
+
+
+
+
+
+
+
+
 app.listen(port, () => {
   console.log(`connetion is setup at ${port}`);
 });
+
 
 

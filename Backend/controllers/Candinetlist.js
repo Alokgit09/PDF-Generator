@@ -6,7 +6,7 @@ const PdfData = require("../models/Pdfpathdata");
 const CandinetlistAdmin = async (req, res) => {
     try {
         const findAllcandidates = await UserData.find();
-        res.json(findAllcandidates)
+        res.status(201).json(findAllcandidates)
     } catch (err) {
         console.log(err);
     }

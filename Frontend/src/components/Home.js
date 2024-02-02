@@ -28,27 +28,39 @@ const Home = () => {
   };
 
   const handleCandinetList = async () => {
-    try {
-      const response = await axios.get('http://localhost:9090/allcandidates');
-      // const CandinetData = JSON.stringify(response.data);
-      const CandinetData = response.data;
-      setCandinetList(CandinetData);
-      setinicial(CandinetData);
-      console.log("CandinetData>>", CandinetData);
-    } catch (err) {
-      console.log("handleCandinetList Error>>", err);
-    }
 
+    const token = localStorage.getItem("token");
+    console.log("token>>", token);
+    if (!token) {
+      console.error("Token is missing");
+      navigate('/login');
+    } else {
+      try {
+        const response = await axios.get('http://localhost:9090/allcandidates', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        // console.log("res>>>", response.data);
+        const CandinetData = response.data;
+        setCandinetList(CandinetData);
+        setinicial(CandinetData);
+        // console.log("CandinetData>>", CandinetData);
+      } catch (err) {
+        console.log("handleCandinetList Error>>", err.message);
+      }
+    }
   };
 
   const handleGetId = async (id) => {
     try {
       const response = await axios.post(`http://localhost:9090/clickgetpdf/${id}`);
       let resultData = response.data;
-      console.log("resultData>>", resultData);
+      // console.log("resultData>>", resultData);
       if (resultData) {
         localStorage.setItem("UserBtn", JSON.stringify(resultData));
-        navigate("report");
+        navigate("/report");
 
       } else {
         alert("Invalid Registered Id and Name");
@@ -81,9 +93,9 @@ const Home = () => {
         <div className='siteBar_sec'>
           <h3>Dashboard</h3>
           <div className='sidesec-sec1'>
-            <div className='side_link'><Link to="/">Home</Link></div>
-            {/* <div className='side_link'><Link to="/report">Report</Link></div>
-            <div className='side_link'> <Link to="/login">LogIn</Link></div> */}
+            <div className='side_link'><Link to="/home">Home</Link></div>
+            <div className='side_link'><Link to="/">SignUp</Link></div>
+            <div className='side_link'> <Link to="/login">LogIn</Link></div>
           </div>
         </div>
         <div className='top_bar'>
