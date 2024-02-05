@@ -15,13 +15,14 @@ const LogIn = () => {
       }
       );
       let resultData = result.data;
-      // console.log("resultData>>", resultData.Token);
+      console.log("resultData>>", resultData.Token);
       if (resultData) {
         navigate("/home")
         localStorage.setItem("token", resultData.Token);
       }
     } catch (err) {
       console.log("login Page Err >>", err);
+      // alert(err.response.data.message);
       alert(err.response.data.message);
     }
   };

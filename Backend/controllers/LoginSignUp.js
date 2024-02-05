@@ -30,15 +30,19 @@ const adminLogininfo = async (req, res) => {
         const email = req.body.email;
         const password = req.body.password;
         const logData = await adminData.findOne({ email: email });
-        const isMatch = await bcrypt.compare(password, logData.password);
-        // console.log("isMatch>>", logData);
-        const token = await logData.GenerateAuthToken();
-        console.log("token1>>", token);
-        const multiValue = { email: logData.email, Token: token };
-        if (isMatch) {
-            res.status(201).json(multiValue);
+        if (logData) {
+            const isMatch = await bcrypt.compare(password, logData.password);
+            // console.log("isMatch>>", isMatch);
+            const token = await logData.GenerateAuthToken();
+            console.log("token1>>", token);
+            const multiValue = { email: logData.email, Token: token };
+            if (isMatch) {
+                res.status(201).json(multiValue);
+            } else {
+                res.status(400).json({ message: "Invalid Password" });
+            }
         } else {
-            res.status(400).send({ message: "Invalid E-Mail Details" });
+            res.status(400).json({ message: "Invalid E-mail" });
         }
     } catch (err) {
         console.log("loging error>>", err);
